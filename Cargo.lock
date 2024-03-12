@@ -19,9 +19,9 @@ checksum = "f26201604c87b1e01bd3d98f8d5d9a8fcbb815e8cedb41ffccbeb4bf593a35fe"
 
 [[package]]
 name = "aes"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac1f845298e95f983ff1944b728ae08b8cebab80d684f0a832ed0fc74dfa27e2"
+checksum = "b169f7a6d4742236a0a00c541b845991d0ac43e546831af1249753ab4c3aa3a0"
 dependencies = [
  "cfg-if",
  "cipher",
@@ -679,7 +679,7 @@ dependencies = [
 [[package]]
 name = "electrumd"
 version = "0.1.0"
-source = "git+https://github.com/shesek/electrumd?rev=6eac0b7b1f2447472016e2c1473a6284f7f8648e#6eac0b7b1f2447472016e2c1473a6284f7f8648e"
+source = "git+https://github.com/delta1/electrumd?rev=687599aecbd19237f5a48294f3a1fe3365021cac#687599aecbd19237f5a48294f3a1fe3365021cac"
 dependencies = [
  "bitcoin_hashes 0.10.0",
  "home",
