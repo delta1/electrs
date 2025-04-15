@@ -8,7 +8,6 @@ use crate::new_index::{compute_script_hash, Query, SpendingInput, Utxo};
 use crate::util::{
     create_socket, electrum_merkle, extract_tx_prevouts, get_innerscripts, get_tx_fee, has_prevout,
     is_coinbase, BlockHeaderMeta, BlockId, FullHash, ScriptToAddr, ScriptToAsm, TransactionStatus,
-    optional_value_for_newer_blocks,
     DEFAULT_BLOCKHASH,
 };
 
@@ -32,6 +31,7 @@ use electrs_macros::trace;
 use {
     crate::elements::{ebcompact::*, peg::PegoutValue, AssetSorting, IssuanceValue},
     elements::{encode, secp256k1_zkp as zkp, AssetId},
+    crate::util::optional_value_for_newer_blocks,
 };
 
 use serde::Serialize;
@@ -52,13 +52,13 @@ const ADDRESS_SEARCH_LIMIT: usize = 10;
 const ASSETS_PER_PAGE: usize = 25;
 #[cfg(feature = "liquid")]
 const ASSETS_MAX_PER_PAGE: usize = 100;
+#[cfg(feature = "liquid")]
+const START_OF_LIQUID_DISCOUNT_CT_POLICY: u32 = 1734120000; // Friday, December 13, 2024, 20:00 GMT
 
 const TTL_LONG: u32 = 157_784_630; // ttl for static resources (5 years)
 const TTL_SHORT: u32 = 10; // ttl for volatie resources
 const TTL_MEMPOOL_RECENT: u32 = 5; // ttl for GET /mempool/recent
 const CONF_FINAL: usize = 10; // reorgs deeper than this are considered unlikely
-
-const START_OF_LIQUID_DISCOUNT_CT_POLICY: u32 = 1734120000; // Friday, December 13, 2024, 20:00 GMT
 
 #[derive(Serialize, Deserialize)]
 struct BlockValue {
@@ -184,15 +184,15 @@ impl TransactionValue {
             size: tx.total_size() as u32,
             weight: weight as u64,
             fee,
-            status: Some(TransactionStatus::from(&blockid)),
+            status: Some(TransactionStatus::from(blockid)),
 
             #[cfg(feature = "liquid")]
-            discount_vsize: optional_value_for_newer_blocks(&blockid,
+            discount_vsize: optional_value_for_newer_blocks(blockid,
                                                             START_OF_LIQUID_DISCOUNT_CT_POLICY,
                                                             tx.discount_vsize()),
 
             #[cfg(feature = "liquid")]
-            discount_weight: optional_value_for_newer_blocks(&blockid,
+            discount_weight: optional_value_for_newer_blocks(blockid,
                                                              START_OF_LIQUID_DISCOUNT_CT_POLICY,
                                                              tx.discount_weight()),
 
@@ -415,7 +415,7 @@ impl From<Utxo> for UtxoValue {
         UtxoValue {
             txid: utxo.txid,
             vout: utxo.vout,
-            status: TransactionStatus::from(&utxo.confirmed),
+            status: TransactionStatus::from(utxo.confirmed),
 
             #[cfg(not(feature = "liquid"))]
             value: utxo.value,
@@ -454,7 +454,7 @@ impl From<SpendingInput> for SpendingValue {
             spent: true,
             txid: Some(spend.txid),
             vin: Some(spend.vin),
-            status: Some(TransactionStatus::from(&spend.confirmed)),
+            status: Some(TransactionStatus::from(spend.confirmed)),
         }
     }
 }
